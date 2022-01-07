@@ -12,20 +12,18 @@ namespace WordleBot.App
             var WordFilterSvc = new WordFilterService();
 
             var possibleWords = WordListRepo.GetAllPossibleWordsFromFile();
-            var sortedWords = WordSortingSvc.GetSortedWords(possibleWords);
-
-            var sortedWordsNoDuplicates = WordFilterSvc.FilterOutDuplicateLetters(sortedWords);
+            var sortedWords = WordSortingSvc.GetSortedWords(possibleWords, applyDuplicateMultiplier: true);
 
             var guessIsCorrect = false;
             while (!guessIsCorrect)
             {
-                if (!sortedWordsNoDuplicates.Any())
+                if (!sortedWords.Any())
                 {
                     Console.WriteLine($"No words left to guess. Exiting.");
                     return;
                 }
 
-                string guessedWord = sortedWordsNoDuplicates[0];
+                string guessedWord = sortedWords[0];
 
                 Console.WriteLine($"Guessed word: {guessedWord}");
 
@@ -35,8 +33,8 @@ namespace WordleBot.App
 
                 guessIsCorrect = guessResult.IsCorrect();
 
-                sortedWordsNoDuplicates = WordFilterSvc.FilterWordsBasedOnResult(
-                    sortedWordsNoDuplicates,
+                sortedWords = WordFilterSvc.FilterWordsBasedOnResult(
+                    sortedWords,
                     guessResult
                 );
             }
