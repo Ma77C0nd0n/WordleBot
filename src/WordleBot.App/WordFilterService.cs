@@ -5,17 +5,6 @@ namespace WordleBot.App
 {
     public class WordFilterService
     {
-        public List<string> FilterOutDuplicateLetters(List<string> inputWords)
-        {
-            var remainingStrings = new List<string>();
-            foreach (string word in inputWords)
-            {
-                if (word.Distinct().Count() == word.Length)
-                    remainingStrings.Add(word);
-            }
-            return remainingStrings;
-        }
-
         public List<string> FilterWordsBasedOnResult(
             List<string> words,
             GuessResult result)
@@ -25,7 +14,7 @@ namespace WordleBot.App
             {
                 if (!word.Intersect(result.IncorrectChars).Any())
                 {
-                    var numberOfCharsOutOfPos = 0;
+                    var charactersOutOfPos = new List<char>();
 
                     for (int index = 0; index < 5; index++)
                     {
@@ -36,9 +25,9 @@ namespace WordleBot.App
                                 break;
                         if (result.CorrectCharsOutOfPosition.Values.Contains(curChar))
                         {
-                            numberOfCharsOutOfPos++;
+                            charactersOutOfPos.Add(curChar);
                         }
-                        if (index == 4 && numberOfCharsOutOfPos == result.CorrectCharsOutOfPosition.Count)
+                        if (index == 4 && charactersOutOfPos.Distinct().Count() == result.CorrectCharsOutOfPosition.Count)
                         {
                             includedList.Add(word);
                         }

@@ -5,7 +5,9 @@ namespace WordleBot.App
 {
     public class WordSortingService
     {
-        public List<string> GetSortedWords(List<string> possibleWords)
+        private const int DuplicateMultiplierConst = 10;
+
+        public List<string> GetSortedWords(List<string> possibleWords, bool applyDuplicateMultiplier)
         {
             var characterFrequencyDictionary = new Dictionary<char, int>();
 
@@ -31,6 +33,11 @@ namespace WordleBot.App
                 foreach (char curChar in word)
                 {
                     wordValue += characterFrequencyDictionary[curChar];
+                }
+                if (applyDuplicateMultiplier)
+                {
+                    var duplicateMultiplier = ((word.Length - word.Distinct().Count()) * DuplicateMultiplierConst) + 1;
+                    wordValue /= duplicateMultiplier;
                 }
                 wordValuesDictionary.Add(word, wordValue);
             }
