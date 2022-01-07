@@ -23,8 +23,6 @@ namespace WordleBot.App
                 }
             }
 
-            var sortedCharacters = characterFrequencyDictionary.OrderByDescending(c => c.Value).Select(c => c.Key);
-
             var wordValuesDictionary = new Dictionary<string, int>();
 
             foreach (string word in possibleWords)
