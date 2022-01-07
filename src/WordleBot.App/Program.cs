@@ -1,56 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace WordleBot.App
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            var guessesDictionary = new Dictionary<int, int>();
+
             var WordListRepo = new WordListRepository();
-            var WordSortingSvc = new WordSortingService();
-            var WordFilterSvc = new WordFilterService();
-
+            var Guesser = new GuessOrchestrator();
+            
             var possibleWords = WordListRepo.GetAllPossibleWordsFromFile();
-            var sortedWords = WordSortingSvc.GetSortedWords(possibleWords, applyDuplicateMultiplier: true);
 
-            var guessIsCorrect = false;
-            while (!guessIsCorrect)
+            foreach (var correctWord in possibleWords)
             {
-                if (!sortedWords.Any())
-                {
-                    Console.WriteLine($"No words left to guess. Exiting.");
-                    return;
-                }
+                Guesser.MakeGuess(possibleWords, correctWord, out int numberOfGuesses);
 
-                string guessedWord = sortedWords[0];
-
-                Console.WriteLine($"Guessed word: {guessedWord}");
-
-                var result = Console.ReadLine();
-
-                var guessResult = ConvertToGuessResult(guessedWord, result);
-
-                guessIsCorrect = guessResult.IsCorrect();
-
-                sortedWords = WordFilterSvc.FilterWordsBasedOnResult(
-                    sortedWords,
-                    guessResult
-                );
+                guessesDictionary.TryGetValue(numberOfGuesses, out int currentCount);
+                guessesDictionary[numberOfGuesses] = currentCount + 1;
             }
-            Console.WriteLine("Guess was correct");
-        }
 
-        private static GuessResult ConvertToGuessResult(string input, string result)
-        {
-            var guessRes = new GuessResult();
-            for (int i=0; i < 5; i++)
+            var numberOfGuessesSorted = guessesDictionary.Keys.ToList();
+            numberOfGuessesSorted.Sort();
+
+            Console.WriteLine("Guesses:");
+
+            foreach (var k in numberOfGuessesSorted)
             {
-                var curChar = input[i];
-                var curCharRes = (ResultValue) char.GetNumericValue(result[i]);
-                guessRes.Add(curChar, i, curCharRes);
+                Console.WriteLine("{0} = {1}", k, guessesDictionary[k]);
             }
-            return guessRes;
         }
     }
 }
