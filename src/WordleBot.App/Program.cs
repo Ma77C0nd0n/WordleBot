@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace WordleBot.App
 {
@@ -7,8 +7,6 @@ namespace WordleBot.App
     {
         static void Main(string[] args)
         {
-            string word = "tiger";
-
             var WordListRepo = new WordListRepository();
             var WordSortingSvc = new WordSortingService();
             var WordFilterSvc = new WordFilterService();
@@ -16,34 +14,45 @@ namespace WordleBot.App
             var possibleWords = WordListRepo.GetAllPossibleWordsFromFile();
             var sortedWords = WordSortingSvc.GetSortedWords(possibleWords);
 
-            string guessedWord = "fiber";
+            var sortedWordsNoDuplicates = WordFilterSvc.FilterOutDuplicateLetters(sortedWords);
 
-            //var filteredWords = WordFilterSvc.FilterWordsBasedOnResult(
-            //    sortedWords, 
-            //    new char[] {'f', 'b'},
-            //    new Dictionary<int, char> { { 1, 'i'}, { 3, 'e'}, { 4, 'r'} },
-            //    new Dictionary<int, char>()
-            //);
+            var guessIsCorrect = false;
+            while (!guessIsCorrect)
+            {
+                if (!sortedWordsNoDuplicates.Any())
+                {
+                    Console.WriteLine($"No words left to guess. Exiting.");
+                    return;
+                }
 
-            var filteredWords = WordFilterSvc.FilterWordsBasedOnResult(
-                sortedWords,
-                new char[] { 'f', 'b', 'a', 'z', 'o' },
-                new Dictionary<int, char> (),
-                new Dictionary<int, char>()
-            );
+                string guessedWord = sortedWordsNoDuplicates[0];
 
-            Console.WriteLine("Hello World!");
+                Console.WriteLine($"Guessed word: {guessedWord}");
+
+                var result = Console.ReadLine();
+
+                var guessResult = ConvertToGuessResult(guessedWord, result);
+
+                guessIsCorrect = guessResult.IsCorrect();
+
+                sortedWordsNoDuplicates = WordFilterSvc.FilterWordsBasedOnResult(
+                    sortedWordsNoDuplicates,
+                    guessResult
+                );
+            }
+            Console.WriteLine("Guess was correct");
         }
 
-        private GuessResult MakeGuess(string wordToBeGuessed, string correctGuess)
+        private static GuessResult ConvertToGuessResult(string input, string result)
         {
-            return new GuessResult() 
+            var guessRes = new GuessResult();
+            for (int i=0; i < 5; i++)
             {
-                CharacterGuesses = new List<CharacterGuess>()
-                {
-
-                }
-            };
+                var curChar = input[i];
+                var curCharRes = (ResultValue) char.GetNumericValue(result[i]);
+                guessRes.Add(curChar, i, curCharRes);
+            }
+            return guessRes;
         }
     }
 }
