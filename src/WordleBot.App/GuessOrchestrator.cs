@@ -35,12 +35,12 @@ namespace WordleBot.App
                 guessIsCorrect = guessResult.IsCorrect();
                 numberOfGuesses++;
 
-                sortedWords = WordFilterSvc.FilterWordsBasedOnResult(
-                    sortedWords,
-                    guessResult
-                );
+                if (guessIsCorrect)
+                    break;
+                else
+                    sortedWords = WordFilterSvc.FilterWordsBasedOnResult(sortedWords, guessResult);
             }
-            //Console.WriteLine("Guess was correct");
+            Console.WriteLine($"Guess \"{sortedWords[0]}\" was correct after {numberOfGuesses} attempts");
         }
 
         private string GetResultStringFromCorrectWordOrInput(string guessedWord, string correctWord)
@@ -55,29 +55,86 @@ namespace WordleBot.App
         private string GetResultStringFromCorrectWord(string guessedWord, string correctWord)
         {
             var resultStr = new char[5];
+            var possibleOutOfPos = new Dictionary<int, char>();
+            var correctPosChars = new List<char>();
+
             for (int i = 0; i < 5; i++)
             {
-                if(guessedWord[i] == correctWord[i])
+                if (guessedWord[i] == correctWord[i])
+                {
                     resultStr[i] = '1';
-                
+                    correctPosChars.Add(guessedWord[i]);
+                }
+
                 else if (correctWord.Contains(guessedWord[i]))
-                    resultStr[i] = '2';
-                
+                {
+                    possibleOutOfPos.Add(i, guessedWord[i]);
+                }
                 else
                     resultStr[i] = '0';
             }
+
+            EvaluateForOutOfPos(correctWord, possibleOutOfPos, correctPosChars, resultStr);
+
             return new string(resultStr);
         }
 
-        private static GuessResult ConvertToGuessResult(string input, string result)
+        private void EvaluateForOutOfPos(string correctWord, Dictionary<int, char> possibleOutOfPos, List<char> correctPosChars, char[] resultStr)
+        {
+            var charsSet = new List<char>();
+            foreach(var outOfPosKeyValuePair in possibleOutOfPos)
+            {
+                if (correctPosChars.Contains(outOfPosKeyValuePair.Value))
+                {
+                    if (HasSufficientMatches(outOfPosKeyValuePair.Value))
+                    {
+                        if (!charsSet.Any())
+                            resultStr[outOfPosKeyValuePair.Key] = '2';
+                        else if (IsExcessDuplicate(outOfPosKeyValuePair.Value))
+                            resultStr[outOfPosKeyValuePair.Key] = '0';
+                        else
+                            resultStr[outOfPosKeyValuePair.Key] = '2';
+                    }
+                    else
+                        resultStr[outOfPosKeyValuePair.Key] = '0';
+                }
+                else
+                {
+                    if (!charsSet.Any())
+                    {
+                        resultStr[outOfPosKeyValuePair.Key] = '2';
+                        charsSet.Add(outOfPosKeyValuePair.Value);
+                    }
+                    else if (IsExcessDuplicate(outOfPosKeyValuePair.Value))
+                        resultStr[outOfPosKeyValuePair.Key] = '0';
+                    else
+                        resultStr[outOfPosKeyValuePair.Key] = '2';
+                }
+            }
+
+            bool HasSufficientMatches(char outOfPosChar) => correctWord.Count(x => x == outOfPosChar) > correctPosChars.Count(x => x == outOfPosChar);
+            bool IsExcessDuplicate(char outOfPosChar) => correctWord.Count(x => x == outOfPosChar) == charsSet.Count(x => x == outOfPosChar) + correctPosChars.Count(x => x == outOfPosChar);
+
+        }
+
+        private GuessResult ConvertToGuessResult(string input, string result)
         {
             var guessRes = new GuessResult();
+            //var incorrectChars = new Dictionary<int, char>();
             for (int i = 0; i < 5; i++)
             {
                 var curChar = input[i];
-                var curCharRes = (ResultValue)char.GetNumericValue(result[i]);
-                guessRes.Add(curChar, i, curCharRes);
+                var curCharRes = (ResultValue) char.GetNumericValue(result[i]);
+                //if (curCharRes == ResultValue.Incorrect)
+                //    incorrectChars.Add(i, curChar);
+                //else
+                    guessRes.Add(curChar, i, curCharRes);
             }
+            //foreach(var incorrectChar in incorrectChars)
+            //{
+            //    guessRes.Add(incorrectChar.Value, incorrectChar.Key, ResultValue.Incorrect);
+            //}
+
             return guessRes;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace WordleBot.App
 {
@@ -40,6 +41,7 @@ namespace WordleBot.App
     {
         Incorrect = 0,
         Correct = 1,
-        OutOfPosition = 2
+        OutOfPosition = 2,
+        UnusedDuplicate = 3
     }
 }
