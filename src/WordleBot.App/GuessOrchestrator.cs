@@ -87,34 +87,31 @@ namespace WordleBot.App
                 if (correctPosChars.Contains(outOfPosKeyValuePair.Value))
                 {
                     if (HasSufficientMatches(outOfPosKeyValuePair.Value))
-                    {
-                        if (!charsSet.Any())
-                            resultStr[outOfPosKeyValuePair.Key] = '2';
-                        else if (IsExcessDuplicate(outOfPosKeyValuePair.Value))
-                            resultStr[outOfPosKeyValuePair.Key] = '0';
-                        else
-                            resultStr[outOfPosKeyValuePair.Key] = '2';
-                    }
+                        SetOutOfPosResultStrValue(charsSet, outOfPosKeyValuePair, resultStr, correctWord, correctPosChars);
                     else
                         resultStr[outOfPosKeyValuePair.Key] = '0';
                 }
                 else
-                {
-                    if (!charsSet.Any())
-                    {
-                        resultStr[outOfPosKeyValuePair.Key] = '2';
-                        charsSet.Add(outOfPosKeyValuePair.Value);
-                    }
-                    else if (IsExcessDuplicate(outOfPosKeyValuePair.Value))
-                        resultStr[outOfPosKeyValuePair.Key] = '0';
-                    else
-                        resultStr[outOfPosKeyValuePair.Key] = '2';
-                }
+                    SetOutOfPosResultStrValue(charsSet, outOfPosKeyValuePair, resultStr, correctWord, correctPosChars);
             }
 
             bool HasSufficientMatches(char outOfPosChar) => correctWord.Count(x => x == outOfPosChar) > correctPosChars.Count(x => x == outOfPosChar);
-            bool IsExcessDuplicate(char outOfPosChar) => correctWord.Count(x => x == outOfPosChar) == charsSet.Count(x => x == outOfPosChar) + correctPosChars.Count(x => x == outOfPosChar);
 
+        }
+
+        private void SetOutOfPosResultStrValue(List<char> charsSet, KeyValuePair<int, char> outOfPosKeyValuePair, char[] resultStr, string correctWord, List<char> correctPosChars)
+        {
+            if (!charsSet.Any())
+            {
+                resultStr[outOfPosKeyValuePair.Key] = '2';
+                charsSet.Add(outOfPosKeyValuePair.Value);
+            }
+            else if (IsExcessDuplicate(outOfPosKeyValuePair.Value))
+                resultStr[outOfPosKeyValuePair.Key] = '0';
+            else
+                resultStr[outOfPosKeyValuePair.Key] = '2';
+
+            bool IsExcessDuplicate(char outOfPosChar) => correctWord.Count(x => x == outOfPosChar) == charsSet.Count(x => x == outOfPosChar) + correctPosChars.Count(x => x == outOfPosChar);
         }
 
         private GuessResult ConvertToGuessResult(string input, string result)
