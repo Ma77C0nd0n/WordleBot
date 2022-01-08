@@ -9,10 +9,11 @@ namespace WordleBot.App
             List<string> words,
             GuessResult result)
         {
+            words.RemoveAt(0);
             var includedList = new List<string>();
             foreach(string word in words)
             {
-                if (!word.Intersect(result.IncorrectChars).Any())
+                if (!WordHasUnusedCharacter(result, word))
                 {
                     var charactersOutOfPos = new List<char>();
 
@@ -22,12 +23,12 @@ namespace WordleBot.App
                         if (result.CorrectCharsInPosition.TryGetValue(index, out char resChar) && (resChar != curChar))
                             break;
                         if (result.CorrectCharsOutOfPosition.TryGetValue(index, out resChar) && resChar == curChar)
-                                break;
+                            break;
                         if (result.CorrectCharsOutOfPosition.Values.Contains(curChar))
                         {
                             charactersOutOfPos.Add(curChar);
                         }
-                        if (index == 4 && charactersOutOfPos.Distinct().Count() == result.CorrectCharsOutOfPosition.Count)
+                        if (index == 4)
                         {
                             includedList.Add(word);
                         }
@@ -35,6 +36,16 @@ namespace WordleBot.App
                 }
             }
             return includedList;
+        }
+
+        private bool WordHasUnusedCharacter(GuessResult result, string word)
+        {
+            var intersectingChars = word.Intersect(result.IncorrectChars);
+            return intersectingChars.Any(c 
+                => !CharacterExistsInOtherPosition(c, result.CorrectCharsInPosition.Values) && 
+                !CharacterExistsInOtherPosition(c, result.CorrectCharsOutOfPosition.Values));
+
+            bool CharacterExistsInOtherPosition(char curChar, IEnumerable<char> correctPositionChars) => correctPositionChars.Contains(curChar);
         }
     }
 }

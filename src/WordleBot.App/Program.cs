@@ -15,6 +15,7 @@ namespace WordleBot.App
             
             var possibleWords = WordListRepo.GetAllPossibleWordsFromFile();
 
+            //var correctWord = "femme";
             foreach (var correctWord in possibleWords)
             {
                 Guesser.MakeGuess(possibleWords, correctWord, out int numberOfGuesses);
