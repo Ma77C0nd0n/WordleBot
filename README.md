@@ -19,5 +19,5 @@ Sample of working solution (side-by-side with wordle game)
 ![wordle_solved](https://user-images.githubusercontent.com/10655290/148473027-0b95a751-885e-4d5c-9772-07f47627db1c.gif)
 
 Success rate (in autoplay, using all 5 letter words):
-![image](https://user-images.githubusercontent.com/10655290/148621452-1e9b5396-d4bd-4406-8f6d-34feacb9bdb4.png)
+![image](https://user-images.githubusercontent.com/10655290/148687896-e9f73446-f975-48bf-8b05-1e3889821a72.png)
 
