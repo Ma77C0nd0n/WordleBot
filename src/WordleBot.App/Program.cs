@@ -8,6 +8,8 @@ namespace WordleBot.App
     {
         public static void Main(string[] args)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
             var guessesDictionary = new Dictionary<int, int>();
 
             var WordListRepo = new WordListRepository();
@@ -15,7 +17,7 @@ namespace WordleBot.App
             
             var possibleWords = WordListRepo.GetAllPossibleWordsFromFile();
 
-            //var correctWord = "femme";
+            //var correctWord = "";
             foreach (var correctWord in possibleWords)
             {
                 Guesser.MakeGuess(possibleWords, correctWord, out int numberOfGuesses);
@@ -33,6 +35,10 @@ namespace WordleBot.App
             {
                 Console.WriteLine("{0} = {1}", k, guessesDictionary[k]);
             }
+
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            Console.WriteLine($"Time to finish: {elapsedMs}ms");
         }
     }
 }

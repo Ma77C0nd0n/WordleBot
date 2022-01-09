@@ -26,9 +26,11 @@ namespace WordleBot.App
 
                 string guessedWord = sortedWords[0];
 
-                //Console.WriteLine($"Guessed word: {guessedWord}");
+                //Console.WriteLine(guessedWord);
 
                 var result = GetResultStringFromCorrectWordOrInput(guessedWord, correctWord);
+
+                //Console.WriteLine(result);
 
                 var guessResult = ConvertToGuessResult(guessedWord, result);
 
