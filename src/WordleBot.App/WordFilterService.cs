@@ -15,8 +15,6 @@ namespace WordleBot.App
             {
                 if (!WordHasUnusedCharacter(result, word))
                 {
-                    var charactersOutOfPos = new List<char>();
-
                     for (int index = 0; index < 5; index++)
                     {
                         var curChar = word[index];
@@ -24,11 +22,11 @@ namespace WordleBot.App
                             break;
                         if (result.CorrectCharsOutOfPosition.TryGetValue(index, out resChar) && resChar == curChar)
                             break;
-                        if (result.CorrectCharsOutOfPosition.Values.Contains(curChar))
-                        {
-                            charactersOutOfPos.Add(curChar);
-                        }
-                        if (index == 4)
+                        if (index == 4 && NumberOfOutOfPositionIsCorrect(
+                            result.CorrectCharsOutOfPosition.Values.ToList(), 
+                            result.CorrectCharsInPosition.Keys, 
+                            word
+                        ))
                         {
                             includedList.Add(word);
                         }
@@ -45,7 +43,15 @@ namespace WordleBot.App
                 => !CharacterExistsInOtherPosition(c, result.CorrectCharsInPosition.Values) && 
                 !CharacterExistsInOtherPosition(c, result.CorrectCharsOutOfPosition.Values));
 
-            bool CharacterExistsInOtherPosition(char curChar, IEnumerable<char> correctPositionChars) => correctPositionChars.Contains(curChar);
+
+            static bool CharacterExistsInOtherPosition(char curChar, IEnumerable<char> correctPositionChars) => correctPositionChars.Contains(curChar);
+        }
+
+        private bool NumberOfOutOfPositionIsCorrect(List<char> charactersOutOfPos, IEnumerable<int> positionsOfCorrectChars, string word)
+        {
+            var wordWithoutCorrectPos = word;
+            positionsOfCorrectChars.OrderByDescending(i => i).ToList().ForEach(p => wordWithoutCorrectPos = wordWithoutCorrectPos.Remove(p));
+            return word.Intersect(charactersOutOfPos).Count() == charactersOutOfPos.Count;
         }
     }
 }
