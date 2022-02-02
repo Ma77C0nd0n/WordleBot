@@ -18,6 +18,12 @@ Bot for solving [wordle game](https://www.powerlanguage.co.uk/wordle/)
 Sample of working solution (side-by-side with wordle game)
 ![wordle_solved](https://user-images.githubusercontent.com/10655290/148473027-0b95a751-885e-4d5c-9772-07f47627db1c.gif)
 
+Success rate to date on wordle game:
+
+![image](https://user-images.githubusercontent.com/10655290/152156879-4c4b6d08-867d-45c5-9931-f56721864c18.png)
+
 Success rate 90.9% (in autoplay, using all 5 letter words :: max guesses is 6):
 ![image](https://user-images.githubusercontent.com/10655290/148687896-e9f73446-f975-48bf-8b05-1e3889821a72.png)
+
+
 
